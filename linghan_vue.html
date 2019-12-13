@@ -13,14 +13,15 @@ circle {
 
 <body>
   <div id="content" class="row">
-    <svg  width="700" height="500">
+    <svg  width="900" height="500">
     </svg>
   </div>
 
   <div class="row">
   	<div class="col-lg-1"></div>
   	<button id="btn_center" class="btn btn-outline-danger" style="margin-right: 2em;">集合！</button>
-  	<button id="btn_split" class="btn btn-outline-success">解散！</button>
+  	<button id="btn_line" class="btn btn-outline-primary" style="margin-right: 2em;">归队!</button>
+  	<button id="btn_dismiss" class="btn btn-outline-success">解散！</button>
 
   </div>
 
@@ -29,7 +30,7 @@ circle {
 
   <script>
 
-  	var width = 700, height = 400
+  	var width = 900, height = 400
 
 			var colorScale = ['#F8971D','#FFD24F', '#6CB33F']
 			var xCenter = [100,300,500]
@@ -57,12 +58,20 @@ circle {
 		
 }
 
+	function dismiss(){
+		var simulation = d3.forceSimulation(nodes);
+			 simulation.force("charge", d3.forceManyBody().strength(-10))
+			 		   .force("center", d3.forceCenter(width/2, height/2-200))
+			  		   .force("collision", d3.forceCollide().radius(function(d) {
+			    return d.radius;
+			  }))
+			 		 .on("tick", ticked);
+	}
+
 	function go_center(){
 		var simulation = d3.forceSimulation(nodes);
-		simulation.force("charge", d3.forceManyBody().strength(10))
-				  .force("x", d3.forceX().x(function(d){
-				  	return xCenter[1];
-				  }))
+		simulation.force("charge", d3.forceManyBody().strength(15))
+				  .force("center", d3.forceCenter(width/2, height/2-200))
 				  .force("collision", d3.forceCollide().radius(function(d){
 								  	return d.radius;
 								  }))
@@ -96,15 +105,19 @@ circle {
 			  u.exit().remove()
 }
 
-split();
+dismiss();
 
 $("#btn_center").click(function(){
 	go_center();
 });
 
-$("#btn_split").click(function(){
+$("#btn_line").click(function(){
 	split();
 });
+
+$("#btn_dismiss").click(function(){
+	dismiss();
+})
 
 
   </script>
