@@ -106,17 +106,27 @@ circle {
 }
 
 dismiss();
+$("#btn_dismiss").attr("disabled",true);
 
 $("#btn_center").click(function(){
 	go_center();
+	$(this).attr("disabled", true);
+	$("#btn_line").attr("disabled",false);
+	$("#btn_dismiss").attr("disabled",false);
 });
 
 $("#btn_line").click(function(){
 	split();
+	$(this).attr("disabled", true);
+	$("#btn_center").attr("disabled",false);
+	$("#btn_dismiss").attr("disabled",false);
 });
 
 $("#btn_dismiss").click(function(){
 	dismiss();
+	$(this).attr("disabled", true);
+	$("#btn_line").attr("disabled",false);
+	$("#btn_center").attr("disabled",false);
 })
 
 
