@@ -13,8 +13,23 @@ circle {
 
 <body>
   <div id="content" class="row">
-  	<div class="col-lg-6">
+  	<div class="col-lg-5">
+  		<div class="row">
+	  		<div class="display-4 col-lg-6" id="number" style="color: #888888; text-align: center;"></div>
+	  		<div class="dropdown col-lg-3" style="margin: 2em;">
+			  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Bubble Amount
+			  </button>
+			  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+			    <button class="dropdown-item" id="btn20">20</button>
+			    <button class="dropdown-item" id="btn50">50</button>
+			    <button class="dropdown-item" id="btn80">80</button>
+			  </div>
+		  </div>
+
+	</div>
 	    <svg style="width: 700; height: 500;">
+
 	    </svg>
     </div>
 
@@ -25,22 +40,10 @@ circle {
     </div>
   </div>
 
-  <div class="row">
-  	<div class="dropdown" style="margin: 5em;">
-		  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		    Bubble Amount
-		  </button>
-		  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-		    <button class="dropdown-item" onclick="chart(20)">20</button>
-		    <button class="dropdown-item" onclick="chart(50)">50</button>
-		    <button class="dropdown-item" onclick="chart(80)">80</button>
-		  </div>
-</div>
-  		
 
-  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" 
 integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" 
@@ -51,13 +54,35 @@ crossorigin="anonymous"></script>
 
   <script>
 
+//The buttons of controlling the bubble amount.
+//Click different buttons to pass the corresponding number to the chart function
+  	$("#btn20").click(function(){
+  		$("#number").text("20 Bubbles");
+  		chart(20);
+  	});
+  	$("#btn50").click(function(){
+  		$("#number").text("50 Bubbles");
+  		chart(50);
+  	});
+  	$("#btn80").click(function(){
+  		$("#number").text("80 Bubbles");
+  		chart(80);
+  	});
 
+
+//The main function of build the entire bubble chart
   	function chart(num){
+
+  	//Disable the dismiss button when call function chart
   	$("#btn_dismiss").attr("disabled",true);
   	$("#btn_line").attr("disabled",false);
 	$("#btn_center").attr("disabled",false);
+
+
   	var width = 700, height = 400
+  	//the center potion of grouping bubbles.
   	var center = {x:width/1.8, y:height/2 }
+  	//x potions of each team.
   	var teamTitleX = {'Orange':50, 'Yellow':250, 'Green':450};
   	
 
@@ -65,13 +90,15 @@ crossorigin="anonymous"></script>
 	var colorScale = ['#F8971D','#FFD24F', '#6CB33F']
 	var xCenter = [50,250,450]
 	var numNodes = num;
+
+	//Form the nodes data.
 	var nodes = d3.range(numNodes).map(function(d,i) {
 			  return {radius: Math.random() * 25,
 			  		  category: i%3}
 			});
 
 	
-
+	//Show the team labels when call this function
 	function showTitle(){
 		var teamData = d3.keys(teamTitleX);
 		var teams = d3.select('svg').selectAll('.team')
@@ -85,13 +112,15 @@ crossorigin="anonymous"></script>
 				 .text(function(d){return d;});
 				 	}
 
+	//Hide the team labels when call this function
 	function hideTitle(){
 		d3.select('svg').selectAll(".team").remove();
 	}
 
-			
+
+	//Group the bubbles in teams when call this function			
   	function split(){
-  		showTitle();
+  		showTitle(); //show the team labels
   		var simulation = d3.forceSimulation(nodes);
 			 simulation.force("charge", d3.forceManyBody().strength(13))
 			  .force("x", d3.forceX().x(function(d){
@@ -106,6 +135,8 @@ crossorigin="anonymous"></script>
 			  .on("tick", ticked);
 		
 }
+
+	//Group the bubbles use negtive strength to make the bubble sparse
 	function dismiss(){
 		hideTitle();
 		var simulation = d3.forceSimulation(nodes);
@@ -118,6 +149,8 @@ crossorigin="anonymous"></script>
 
 			 		 
 	}
+
+	//Group the bubble to the center point.
 	function go_center(){
 		hideTitle();
 		var simulation = d3.forceSimulation(nodes);
@@ -133,6 +166,7 @@ crossorigin="anonymous"></script>
 		
 
 
+		// Create the bubbles based on nodes data.
 		function ticked() {
 				
 			  var u = d3.select("svg")
@@ -159,9 +193,10 @@ crossorigin="anonymous"></script>
 
 
 
-
+//show the sparse bubble chart when call function chart()
 dismiss();
 
+//call different function to group bubbles in different ways when click on different buttons.
 $("#btn_center").click(function(){
 	go_center();
 	$(this).attr("disabled", true);
@@ -186,6 +221,7 @@ $("#btn_dismiss").click(function(){
 
 
 chart(50);
+$("#number").text("50 Bubbles");
   </script>
 </body>
 </html>
