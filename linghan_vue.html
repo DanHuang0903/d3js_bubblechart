@@ -13,79 +13,131 @@ circle {
 
 <body>
   <div id="content" class="row">
-    <svg  width="900" height="500">
-    </svg>
+  	<div class="col-lg-6">
+	    <svg style="width: 700; height: 500;">
+	    </svg>
+    </div>
+
+    <div class="col-lg-1">
+    	<button id="btn_center" class="btn btn-outline-danger" style="margin-top: 2em; width: 10em;">Attention！</button>
+	  	<button id="btn_line" class="btn btn-outline-primary" style="margin-top: 2em; width: 10em;">Line Up!</button>
+	  	<button id="btn_dismiss" class="btn btn-outline-success" style="margin-top: 2em; width: 10em;">Dismiss！</button>
+    </div>
   </div>
 
   <div class="row">
-  	<div class="col-lg-1"></div>
-  	<button id="btn_center" class="btn btn-outline-danger" style="margin-right: 2em;">集合！</button>
-  	<button id="btn_line" class="btn btn-outline-primary" style="margin-right: 2em;">归队!</button>
-  	<button id="btn_dismiss" class="btn btn-outline-success">解散！</button>
+  	<div class="dropdown" style="margin: 5em;">
+		  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		    Bubble Amount
+		  </button>
+		  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+		    <button class="dropdown-item" onclick="chart(20)">20</button>
+		    <button class="dropdown-item" onclick="chart(50)">50</button>
+		    <button class="dropdown-item" onclick="chart(80)">80</button>
+		  </div>
+</div>
+  		
 
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" 
+integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" 
+crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+crossorigin="anonymous"></script>
 
   <script>
 
-  	var width = 900, height = 400
 
-			var colorScale = ['#F8971D','#FFD24F', '#6CB33F']
-			var xCenter = [100,300,500]
+  	function chart(num){
+  	$("#btn_dismiss").attr("disabled",true);
+  	$("#btn_line").attr("disabled",false);
+	$("#btn_center").attr("disabled",false);
+  	var width = 700, height = 400
+  	var center = {x:width/1.8, y:height/2 }
+  	var teamTitleX = {'Orange':50, 'Yellow':250, 'Green':450};
+  	
 
-			var numNodes = 100
-			var nodes = d3.range(numNodes).map(function(d,i) {
+  	
+	var colorScale = ['#F8971D','#FFD24F', '#6CB33F']
+	var xCenter = [50,250,450]
+	var numNodes = num;
+	var nodes = d3.range(numNodes).map(function(d,i) {
 			  return {radius: Math.random() * 25,
 			  		  category: i%3}
 			});
 
+	
+
+	function showTitle(){
+		var teamData = d3.keys(teamTitleX);
+		var teams = d3.select('svg').selectAll('.team')
+						.data(teamData);
+			teams.enter()
+				 .append('text')
+				 .attr('class','team')
+				 .attr('x', function(d){return teamTitleX[d];})
+				 .attr('y',50)
+				 .attr('text-anchor', 'start')
+				 .text(function(d){return d;});
+				 	}
+
+	function hideTitle(){
+		d3.select('svg').selectAll(".team").remove();
+	}
 
 			
-
   	function split(){
+  		showTitle();
   		var simulation = d3.forceSimulation(nodes);
-			 simulation.force("charge", d3.forceManyBody().strength(5))
+			 simulation.force("charge", d3.forceManyBody().strength(13))
 			  .force("x", d3.forceX().x(function(d){
-			  	return xCenter[d.category];
+			  	return d.x + (xCenter[d.category] - d.x);
+			  }))
+			  .force("y", d3.forceY().y(function(d){
+			  	return d.y + (height/2-200 - d.y);
 			  }))
 			  .force("collision", d3.forceCollide().radius(function(d) {
 			    return d.radius;
 			  }))
 			  .on("tick", ticked);
-
 		
 }
-
 	function dismiss(){
+		hideTitle();
 		var simulation = d3.forceSimulation(nodes);
-			 simulation.force("charge", d3.forceManyBody().strength(-10))
-			 		   .force("center", d3.forceCenter(width/2, height/2-200))
+			 simulation.force("charge", d3.forceManyBody().strength(-15))
+			 		   .force("center", d3.forceCenter(width/2.5, height/2-200))
 			  		   .force("collision", d3.forceCollide().radius(function(d) {
 			    return d.radius;
 			  }))
 			 		 .on("tick", ticked);
-	}
 
+			 		 
+	}
 	function go_center(){
+		hideTitle();
 		var simulation = d3.forceSimulation(nodes);
-		simulation.force("charge", d3.forceManyBody().strength(15))
-				  .force("center", d3.forceCenter(width/2, height/2-200))
+		simulation.force("charge", d3.forceManyBody().strength(20))
+				  .force("center", d3.forceCenter(width/2.5, height/2-200))
 				  .force("collision", d3.forceCollide().radius(function(d){
 								  	return d.radius;
 								  }))
 				  .on("tick",ticked);
 	}
 
-		function ticked() {
-				// var canvas = d3.select("svg")
-				//   			  .attr("transform","translate(50,200)");
 
+		
+
+
+		function ticked() {
+				
 			  var u = d3.select("svg")
 			    .selectAll("circle")
 			    .data(nodes)
-
 			  u.enter()
 			    .append("circle")
 			    .attr("r", function(d) {
@@ -96,17 +148,19 @@ circle {
 			    })
 			    .merge(u)
 			    .attr('cx', function(d) {
-			      return d.x
+			      return d.x;
 			    })
 			    .attr('cy', function(d) {
 			      return d.y + 200;
 			    })
-
 			  u.exit().remove()
 }
 
+
+
+
+
 dismiss();
-$("#btn_dismiss").attr("disabled",true);
 
 $("#btn_center").click(function(){
 	go_center();
@@ -114,22 +168,24 @@ $("#btn_center").click(function(){
 	$("#btn_line").attr("disabled",false);
 	$("#btn_dismiss").attr("disabled",false);
 });
-
 $("#btn_line").click(function(){
 	split();
 	$(this).attr("disabled", true);
 	$("#btn_center").attr("disabled",false);
 	$("#btn_dismiss").attr("disabled",false);
 });
-
 $("#btn_dismiss").click(function(){
 	dismiss();
 	$(this).attr("disabled", true);
 	$("#btn_line").attr("disabled",false);
 	$("#btn_center").attr("disabled",false);
-})
+});
 
 
+}
+
+
+chart(50);
   </script>
 </body>
 </html>
